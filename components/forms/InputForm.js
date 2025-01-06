@@ -59,7 +59,7 @@ const InputForm = ({ onSubmit }) => {
                     alert('Customer creation aborted.');
                 }
             } else if (!res.success) {
-                throw new Error('Failed to submit form.');
+                throw new Error(res.error || 'Failed to submit form.');
             } else {
                 alert('Form submitted successfully!');
             }

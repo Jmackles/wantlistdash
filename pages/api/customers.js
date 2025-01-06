@@ -44,6 +44,26 @@ export default async function handler(req, res) {
             }
             break;
 
+        case 'PUT': // Update customer
+            const { id, updatedFields } = req.body;
+            try {
+                const updateQuery = Object.keys(updatedFields)
+                    .map((field) => `${field} = ?`)
+                    .join(', ');
+                const values = Object.values(updatedFields);
+
+                await db.run(
+                    `UPDATE customers SET ${updateQuery} WHERE id = ?`,
+                    [...values, id]
+                );
+
+                res.status(200).json({ success: true });
+            } catch (error) {
+                console.error('Error in PUT /api/customers:', error);
+                res.status(500).json({ error: error.message });
+            }
+            break;
+
         case 'GET': // Fetch all customers
             try {
                 const customers = await db.all('SELECT * FROM customers');

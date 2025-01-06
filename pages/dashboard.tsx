@@ -83,14 +83,12 @@ const Dashboard = () => {
                 });
             }
     
-            alert('Form submitted successfully!');
+            return { success: true };
         } catch (error) {
             console.error('Error in handleFormSubmit:', error);
-            alert(error.message || 'An unexpected error occurred.');
+            return { success: false, error: error.message };
         }
     };
-    
-    
     
     
 
