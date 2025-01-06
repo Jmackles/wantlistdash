@@ -54,21 +54,23 @@ const Dashboard = () => {
             const customerData = await customerRes.json();
             const customer_id = customerData.id || customerData.customer?.id;
 
-            // Submit want-list entry
-            const wantListRes = await fetch('/api/want-list', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    customer_id,
-                    initial,
-                    notes,
-                    plants: plants || [],
-                }),
-            });
+            // If plants are provided, submit want-list entry
+            if (plants && plants.length > 0) {
+                const wantListRes = await fetch('/api/want-list', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        customer_id,
+                        initial,
+                        notes,
+                        plants,
+                    }),
+                });
 
-            if (!wantListRes.ok) {
-                const errorData = await wantListRes.json();
-                throw new Error(errorData.error || 'Failed to add want list entry.');
+                if (!wantListRes.ok) {
+                    const errorData = await wantListRes.json();
+                    throw new Error(errorData.error || 'Failed to add want list entry.');
+                }
             }
 
             // If spokenTo is specified, log it
