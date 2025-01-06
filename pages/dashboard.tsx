@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import InputForm from '../components/forms/InputForm';
 import CustomerCard from '../components/cards/CustomerCard';
+import { Customer } from '../lib/types';
 
 const Dashboard = () => {
-    const [customers, setCustomers] = useState([]);
-    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [customers, setCustomers] = useState<Customer[]>([]);
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+    const [editCustomerData, setEditCustomerData] = useState<Partial<Customer>>({});
     const [editMode, setEditMode] = useState(false);
-    const [editCustomerData, setEditCustomerData] = useState({});
 
     useEffect(() => {
         const fetchCustomers = async () => {
@@ -25,14 +26,13 @@ const Dashboard = () => {
                 setCustomers([]); // Fallback to empty array on error
             }
         };
-    
+
         fetchCustomers();
     }, []);
-    
 
     const handleFormSubmit = async (formData) => {
         const { firstName, lastName, phone, email, initial, notes, plants, spokenTo } = formData;
-    
+
         try {
             // Add or fetch customer
             const customerRes = await fetch('/api/customers', {
@@ -45,15 +45,15 @@ const Dashboard = () => {
                     email,
                 }),
             });
-    
+
             if (!customerRes.ok) {
                 const errorData = await customerRes.json();
                 throw new Error(errorData.error || 'Failed to add or fetch customer.');
             }
-    
+
             const customerData = await customerRes.json();
             const customer_id = customerData.id || customerData.customer?.id;
-    
+
             // Submit want-list entry
             const wantListRes = await fetch('/api/want-list', {
                 method: 'POST',
@@ -65,12 +65,12 @@ const Dashboard = () => {
                     plants: plants || [],
                 }),
             });
-    
+
             if (!wantListRes.ok) {
                 const errorData = await wantListRes.json();
                 throw new Error(errorData.error || 'Failed to add want list entry.');
             }
-    
+
             // If spokenTo is specified, log it
             if (spokenTo) {
                 await fetch('/api/spoken-to', {
@@ -82,15 +82,13 @@ const Dashboard = () => {
                     }),
                 });
             }
-    
+
             return { success: true };
         } catch (error) {
             console.error('Error in handleFormSubmit:', error);
             return { success: false, error: error.message };
         }
     };
-    
-    
 
     const handleEditCustomer = async () => {
         const res = await fetch('/api/customers', {
