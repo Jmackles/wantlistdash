@@ -26,6 +26,19 @@ const WantListDashboard = () => {
         setEditData((prev) => ({ ...prev, [field]: value }));
     };
 
+    const handlePlantChange = (index, field, value) => {
+        const updatedPlants = [...editData.plants];
+        updatedPlants[index][field] = value;
+        setEditData({ ...editData, plants: updatedPlants });
+    };
+
+    const handleAddPlant = () => {
+        setEditData({
+            ...editData,
+            plants: [...editData.plants, { name: '', size: '', quantity: 1 }],
+        });
+    };
+
     const saveChanges = async () => {
         try {
             const res = await fetch(`/api/want-list`, {
@@ -43,10 +56,12 @@ const WantListDashboard = () => {
                 setWantListEntries(updatedEntries);
                 closeModal();
             } else {
-                alert('Failed to save changes.');
+                const errorData = await res.json();
+                alert(`Failed to save changes: ${errorData.error}`);
             }
         } catch (error) {
             console.error('Error saving changes:', error);
+            alert('An unexpected error occurred while saving changes.');
         }
     };
 
@@ -110,10 +125,36 @@ const WantListDashboard = () => {
                             <ul className="list-disc pl-4">
                                 {editData.plants?.map((plant, index) => (
                                     <li key={index}>
-                                        {plant.name} - {plant.size || 'N/A'} - Qty: {plant.quantity || 1}
+                                        <input
+                                            type="text"
+                                            placeholder="Plant Name"
+                                            value={plant.name}
+                                            onChange={(e) => handlePlantChange(index, 'name', e.target.value)}
+                                            className="w-full p-2 border rounded mb-2"
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Size"
+                                            value={plant.size}
+                                            onChange={(e) => handlePlantChange(index, 'size', e.target.value)}
+                                            className="w-full p-2 border rounded mb-2"
+                                        />
+                                        <input
+                                            type="number"
+                                            placeholder="Quantity"
+                                            value={plant.quantity}
+                                            onChange={(e) => handlePlantChange(index, 'quantity', e.target.value)}
+                                            className="w-full p-2 border rounded mb-2"
+                                        />
                                     </li>
                                 ))}
                             </ul>
+                            <button
+                                className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+                                onClick={handleAddPlant}
+                            >
+                                Add Plant
+                            </button>
                         </div>
 
                         <div className="flex justify-end space-x-2">

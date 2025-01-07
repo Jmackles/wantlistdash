@@ -29,5 +29,3 @@ const WantListCard = ({ entry, onClick }) => {
 };
 
 export default WantListCard;
-
-
